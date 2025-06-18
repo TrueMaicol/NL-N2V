@@ -1,0 +1,18 @@
+# ignore pycache files
+__pycache__/
+*.py[cod]
+
+# ignore data folder
+datasets
+datasets/*
+output
+output/*
+submissions
+submissions/*
+
+# ignore chekpoint folder
+checkpoint/*
+
+# ignore utility_files folder
+utility_files
+utility_files/*

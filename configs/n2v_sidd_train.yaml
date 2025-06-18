@@ -1,0 +1,102 @@
+# This file contains a configuration example for the training of N2V on SIDD dataset
+output_folder: /path/to/output/folder
+
+# Set the model to be used
+model:
+  type: NL_BSN
+  restore: True
+  kwargs:
+    bsn: 'UNet2'
+    in_channels: 3
+    features: [96, 192]
+
+# Set the masker (if "N2V_Masker" -> N2V)
+masker:
+  masker_type: "N2V_Masker"
+  masker_args: 
+    pixel_perc: 0.002
+    # Set masking strategy, see the ones available in src/masker/n2v_masker.py
+    strat_name: "uniform_withoutCP"
+    prox_radius: 3
+
+# Set the training dictionary
+training:
+  dataset: SIDD_train
+
+  dataset_args:
+    data_dir: /path/to/dataset/folder
+    # Set dimension of the training patches (cropped randomly)
+    crop_size: [256, 256]
+    augmentations: ['flip', 'rotate']
+    # Number of times the images of the dataset are seen per epoch
+    repeat_times: 1
+  
+  batch_size: 32
+  max_epochs: 100
+  init_lr: 5e-6
+  loss: 1*self_L2 # First number is an eventual multiplied constant, the other can also be "self_L1"
+  tmp_info: []
+
+  optimizer: 
+    type: Adam
+    Adam:
+      betas: [0.9, 0.999]
+  
+  scheduler:
+    type: step
+    step:
+      step_size: 15
+      gamma: 0.5
+
+# Set the validation dictionary
+validation:
+  dataset: SIDD_val
+
+  dataset_args:
+    data_dir: /path/to/dataset/folder
+    crop_size: None
+    augmentations: None
+  
+  batch_size: 1
+
+  val: True
+
+  save_image: True
+  save_only_preds: True
+
+  # Number of times the validation images are saved during the entire training process
+  num_of_saves: 10
+  # When to start calculating validation
+  start_epoch: 1
+  # How many epochs between 1 validation computation and the other
+  interval_epoch: 1
+  
+  val_pad: True
+
+# Set the number of batches to compute before logging the loss
+log: 
+  iter_interval: 100
+
+# Set the test dictionary
+test:
+  dataset: SIDD_test
+
+  dataset_args:
+    data_dir: /path/to/dataset/folder
+    crop_size: None
+    augmentations: None
+  
+  batch_size: 1
+  save_image: True
+  test_pad: True
+
+# Set the checkpoint dictionary
+checkpoint:
+  # Whether to save checkpoints
+  save: True
+  # When to start saving checkpoints
+  start_epoch: 1
+  # After how many epochs to save a new checkpoint
+  interval_epoch: 1
+  # Whether to save all checkpoints or only the last 2 and the best 2 on validation (best on PSNR and best on SSIM)
+  save_all: False
