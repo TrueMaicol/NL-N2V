@@ -1,6 +1,6 @@
 # Non-Local N2V: Improving N2V networks for spatially correlated noise
 
-This is an official PyTorch implementation of "Non-Local N2V: Improving N2V networks for spatially correlated noise" published in [ICIP 2025](https://2025.ieeeicip.org/).
+This is an official PyTorch implementation of "Non-Local N2V: Improving N2V networks for spatially correlated noise" accepted for publishing at [ICIP 2025](https://2025.ieeeicip.org/).
 
 **Authors**:  
 Diego Martin, Edoardo Peretti, Giacomo Boracchi
@@ -9,7 +9,7 @@ Diego Martin, Edoardo Peretti, Giacomo Boracchi
 
 *Blind Spot Networks (BSNs) are powerful deep denoisers that can be trained in a self-supervised way, namely without access to clean images. The training scheme of BSN-based methods builds upon the assumption that noise is pixel-wise independent and zero-mean. However, this assumption is not satisfied in many real-world scenarios, where the noise exhibits spatial correlation that degrades BSN denoising performance. Training deep neural networks under spatially correlated noise has attracted a lot of interest. However, several approaches require complex network architectures or resource-demanding training procedures, resulting in less practical solutions than simple BSNs. In this work, we present Non-Local N2V (NL-N2V), an extension of the mainstream Noise2Void (N2V) method. It is designed to address spatially correlated noise while maintaining the simplicity and the network architecture of N2V. Our approach introduces a novel masking strategy inspired by the Non-Local Self-Similarity prior that masks small regions around blind spots and replaces these with values obtained from non-local similar patches. Tests performed on real-world datasets corrupted by correlated noise, such as SIDD and DND, show that NL-N2V considerably outperforms the traditional N2V.*
 
-Here is the link for the [paper](#TODO Insert the paper link).
+Here is the link for the [paper](Paper link will be provided when available).
 
 ---
 
@@ -304,6 +304,6 @@ python prep_submission_DND.py
 
 Please cite this works as:
 
-#TODO: Insert correct citation when the article is published
+Citation will be added when available
 
 
