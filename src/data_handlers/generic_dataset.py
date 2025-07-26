@@ -123,7 +123,7 @@ class GenericDataset(Dataset):
         
         # Expand std_dev to match image dimensions for broadcasting
         std_dev_expanded = std_dev.view(-1, 1, 1) * noise_boost
-        gaussian = torch.normal(0, std_dev_expanded.expand_as(data[key]), dtype=torch.float32)
+        gaussian = torch.normal(0, std_dev_expanded.expand_as(data[key]))
 
         if correlate:
           correlated_gaussian = torch.zeros_like(gaussian)

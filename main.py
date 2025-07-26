@@ -41,5 +41,5 @@ def main(arg:list=None):
   trainer.train()
 
 if __name__ == "__main__":
-  arg_list = ['--config=unet2_tr', '--run_name=dnd_02', '--gpu=0']
-  main(arg=arg_list)
+  main()
+  

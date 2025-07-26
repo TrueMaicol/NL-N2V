@@ -11,7 +11,7 @@ class ConfigParser():
         extension (str): String of the extension of the configuration file (default='yaml')
     """
     # load the model configuration
-    cfg_file = os.path.join('config', args.config + '.' + extension)
+    cfg_file = os.path.join('configs', args.config + '.' + extension)
     assert os.path.exists(cfg_file), f"Couldn't find provided file path for the configuration file.\n Got: {cfg_file}"
     with open(cfg_file, 'r') as cfg:
       if extension == 'yaml':

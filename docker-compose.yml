@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  nl-n2v:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nl-n2v-training
+    runtime: nvidia  # For Docker with nvidia-docker2
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - .:/exp
+    working_dir: /exp
+    stdin_open: true
+    tty: true
+    # GPU support for newer Docker Compose
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

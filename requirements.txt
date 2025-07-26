@@ -1,0 +1,19 @@
+# Core ML dependencies (versions from README)
+torch==2.5.1
+torchvision
+torchaudio
+numpy==2.2.0
+opencv-python==4.10.0.84
+scikit-image
+
+# Configuration and utilities
+pyyaml
+tensorboard
+matplotlib
+scipy
+pillow
+tqdm
+
+# Additional dependencies that might be needed
+argparse
+datetime

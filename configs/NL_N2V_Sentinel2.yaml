@@ -1,21 +1,21 @@
 # This file contains a configuration example for the training of NL-N2V on Sentinel-2 dataset
-output_folder: /path/to/output/folder
+output_folder: ./output/
 
 # Set the model to be used
 model:
   type: NL_BSN
   restore: True
   kwargs:
-    bsn: 'UNet2'
+    bsn: "UNet2"
     in_channels: 3
     features: [96, 192]
 
 # Set the masker (if "Masker" -> NL-N2V)
 masker:
   masker_type: "Masker"
-  masker_args: 
+  masker_args:
     # Set hyperparameters: s, q, f, p
-    sim_patch_edge: 21 
+    sim_patch_edge: 21
     repl_patch_edge: 13
     speedup_factor: 5
     pixel_perc: 0.002
@@ -27,31 +27,31 @@ training:
   dataset: Sentinel2_train
 
   dataset_args:
-    data_dir: /datasets/prep/SatelliteImages_s512_o128/train/CL
+    data_dir: ./datasets/prep/SatelliteImages_s512_o128/train/CL
     # Set dimension of the training patches (cropped randomly)
     crop_size: [256, 256]
-    augmentations: ['flip', 'rotate']
+    augmentations: ["flip", "rotate"]
     # Number of times the images of the dataset are seen per epoch
     repeat_times: 2
     # Sentinel-2 specific noise parameters
     add_noise:
-      photon_scale: 1000        # Scale factor for Poisson noise (higher = less noise)
-      noise_boost: 10.0          # Multiplier for Gaussian noise (1.0 = normal, >1.0 = more noise)
-      correlate: True           # Whether to add spatial correlation to Gaussian noise
-      kernel_edge: 5            # Size of correlation kernel (odd number)
-      kernel_sigma: 0.55        # Standard deviation of correlation kernel
-  
-  batch_size: 32
+      photon_scale: 1000 # Scale factor for Poisson noise (higher = less noise)
+      noise_boost: 10.0 # Multiplier for Gaussian noise (1.0 = normal, >1.0 = more noise)
+      correlate: True # Whether to add spatial correlation to Gaussian noise
+      kernel_edge: 5 # Size of correlation kernel (odd number)
+      kernel_sigma: 0.55 # Standard deviation of correlation kernel
+
+  batch_size: 4
   max_epochs: 100
   init_lr: 5e-5
   loss: 1*self_L2 # First number is an eventual multiplied constant, the other can also be "self_L1"
   tmp_info: []
 
-  optimizer: 
+  optimizer:
     type: Adam
     Adam:
       betas: [0.9, 0.999]
-  
+
   scheduler:
     type: step
     step:
@@ -63,17 +63,17 @@ validation:
   dataset: Sentinel2_val
 
   dataset_args:
-    data_dir: /datasets/prep/SatelliteImages_s512_o128/val/CL
+    data_dir: ./datasets/prep/SatelliteImages_s512_o128/val/CL
     crop_size: None
     augmentations: None
     # Add the same noise parameters for validation to get proper clean-noisy pairs
     add_noise:
-      photon_scale: 1000        # Same as training
-      noise_boost: 10.0          # Same as training
-      correlate: True           # Same as training
-      kernel_edge: 5            # Same as training
-      kernel_sigma: 1.0         # Same as training
-  
+      photon_scale: 1000 # Same as training
+      noise_boost: 10.0 # Same as training
+      correlate: True # Same as training
+      kernel_edge: 5 # Same as training
+      kernel_sigma: 1.0 # Same as training
+
   batch_size: 1
 
   val: True
@@ -87,11 +87,11 @@ validation:
   start_epoch: 1
   # How many epochs between 1 validation computation and the other
   interval_epoch: 1
-  
+
   val_pad: True
 
 # Set the number of batches to compute before logging the loss
-log: 
+log:
   iter_interval: 100
 
 # Set the test dictionary
@@ -99,7 +99,7 @@ test:
   dataset: Sentinel2_test
 
   dataset_args:
-    data_dir: /datasets/prep/SatelliteImages_s512_o128/test/CL
+    data_dir: ./datasets/prep/SatelliteImages_s512_o128/test/CL
     crop_size: None
     augmentations: None
     # Add noise for testing (optional - you might want to test on real noisy images)
@@ -109,7 +109,7 @@ test:
       correlate: True
       kernel_edge: 5
       kernel_sigma: 1.0
-  
+
   batch_size: 1
   save_image: True
   test_pad: True
