@@ -12,6 +12,7 @@ from ..model.denoiser import NL_BSN
 from ..data_handlers.SIDD_datasets import SIDDPrepTrain, SIDDValidation, SIDDBenchmark
 from ..data_handlers.BSD68_datasets import BSD68Train, BSD68Validation, BSD68Test
 from ..data_handlers.DND_datasets import DNDTrain, DNDValidation
+from ..data_handlers.Sentinel2_datasets import Sentinel2Train, Sentinel2Validation, Sentinel2Test
 from ..loss.losses import Loss
 from ..masker.masker import Masker
 from ..masker.n2v_masker import N2V_Masker
@@ -721,6 +722,15 @@ class StdTrainer():
       shuffle = True
     elif dataset_name == 'DND_val':
       dataset = DNDValidation(**dataset_args)
+      shuffle = False
+    elif dataset_name == 'Sentinel2_train':
+      dataset = Sentinel2Train(**dataset_args)
+      shuffle = False
+    elif dataset_name == 'Sentinel2_val':
+      dataset = Sentinel2Validation(**dataset_args)
+      shuffle = False
+    elif dataset_name == 'Sentinel2_test':
+      dataset = Sentinel2Test(**dataset_args)
       shuffle = False
     else:
       raise NotImplementedError(f"Class for dataset: {dataset_name}, has not been implemented yet.")

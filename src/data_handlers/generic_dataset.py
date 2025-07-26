@@ -103,27 +103,47 @@ class GenericDataset(Dataset):
       data[key] = data[key].type(torch.float32) * 1/255
       # Might augment also noisy images, not sure 100% cause I'm gonna use it only for clean ones
       if self.noise_dict is not None and key == 'noisy':
-        sigma = float(self.noise_dict['sigma']) / 255
+
+        photon_scale = int(self.noise_dict['photon_scale'])
+        noise_boost = float(self.noise_dict['noise_boost'])
+        correlate = self.noise_dict['correlate']
+        kernel_edge = int(self.noise_dict['kernel_edge'])
+        kernel_sigma = float(self.noise_dict['kernel_sigma'])
+
+
+        # Sentinel-2 band-specific SNRs (R, G, B = B04, B03, B02)
+        snrs = torch.tensor([230, 249, 214], dtype=torch.float32)
+
+        # Add Poisson noise
+        poisson = torch.poisson(data[key] * photon_scale) / photon_scale
+
+        # Add Gaussian noise for each band based on the avg pixel value for that band
+        avg_per_band = torch.mean(data[key], dim=(1, 2))  # Average across spatial dimensions
+        std_dev = avg_per_band / snrs
+        
+        # Expand std_dev to match image dimensions for broadcasting
+        std_dev_expanded = std_dev.view(-1, 1, 1) * noise_boost
+        gaussian = torch.normal(0, std_dev_expanded.expand_as(data[key]), dtype=torch.float32)
+
+        if correlate:
+          correlated_gaussian = torch.zeros_like(gaussian)
+          kernel = self.custom_gkernel(kernel_edge, kernel_sigma)
+          for c in range(gaussian.shape[0]):
+              correlated_gaussian[c] = F.conv2d(gaussian[c].unsqueeze(0), kernel.unsqueeze(0).unsqueeze(0), padding="same").squeeze(0)
+          gaussian = correlated_gaussian
+
+        # Combine noises
+        noisy = poisson + gaussian
+        
+        noisy = torch.clamp(noisy, 0, 1)  # Ensure values are in [0, 1]
+        data[key] = noisy
+      elif self.noise_dict['correlate'] == 'False': 
         mean = float(self.noise_dict['mean'])
-        if self.noise_dict['correlate'] == 'True':
-          c,h,w = data[key].shape
-          noisy_img = torch.zeros_like(data[key])
-          kernel = self.custom_gkernel(int(self.noise_dict['kernel_edge']), float(self.noise_dict['kernel_sigma'])).unsqueeze(0).unsqueeze(0)
-          for ch in range(c):
-            # Generate AWGN
-            awgn = torch.normal(mean=mean, std=sigma, size=(h,w))
-            # Add spatial correlation via convolution
-            awgn = awgn.unsqueeze(0).unsqueeze(0)
-            synth_noise = F.conv2d(awgn, kernel, padding='same')
-            noisy_img[ch] = data[key][ch] + synth_noise.squeeze()
-          # Clip image
-          noisy_img = torch.clamp(noisy_img, 0, 1) 
-          data[key] = noisy_img
-        elif self.noise_dict['correlate'] == 'False': 
-          transform = v2.GaussianNoise(mean=mean, sigma=sigma)
-          data[key] = transform(data[key])
-        else:
-          raise ValueError(f"Weird value for key 'correlate'.\nGot: {self.noise_dict['correlate']}")
+        sigma = float(self.noise_dict['sigma']) / 255
+        transform = v2.GaussianNoise(mean=mean, sigma=sigma)
+        data[key] = transform(data[key])
+      else:
+        raise ValueError(f"Weird value for key 'correlate'.\nGot: {self.noise_dict['correlate']}")
 
     return data
   
