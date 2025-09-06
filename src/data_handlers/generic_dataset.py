@@ -101,49 +101,52 @@ class GenericDataset(Dataset):
     # Normalize the images in the range [0, 1]
     for key in data:
       data[key] = data[key].type(torch.float32) * 1/255
-      # Might augment also noisy images, not sure 100% cause I'm gonna use it only for clean ones
+      
+      # Only apply noise processing to the 'noisy' key
       if self.noise_dict is not None and key == 'noisy':
-
-        photon_scale = int(self.noise_dict['photon_scale'])
-        noise_boost = float(self.noise_dict['noise_boost'])
-        correlate = self.noise_dict['correlate']
-        kernel_edge = int(self.noise_dict['kernel_edge'])
-        kernel_sigma = float(self.noise_dict['kernel_sigma'])
-
-
-        # Sentinel-2 band-specific SNRs (R, G, B = B04, B03, B02)
-        snrs = torch.tensor([230, 249, 214], dtype=torch.float32)
-
-        # Add Poisson noise
-        poisson = torch.poisson(data[key] * photon_scale) / photon_scale
-
-        # Add Gaussian noise for each band based on the avg pixel value for that band
-        avg_per_band = torch.mean(data[key], dim=(1, 2))  # Average across spatial dimensions
-        std_dev = avg_per_band / snrs
         
-        # Expand std_dev to match image dimensions for broadcasting
-        std_dev_expanded = std_dev.view(-1, 1, 1) * noise_boost
-        gaussian = torch.normal(0, std_dev_expanded.expand_as(data[key]))
-
+        # Cast correlate to boolean to handle both boolean and string inputs
+        correlate = bool(self.noise_dict['correlate']) if self.noise_dict['correlate'] != 'False' else False
         if correlate:
+          
+          photon_scale = int(self.noise_dict['photon_scale'])
+          noise_boost = float(self.noise_dict['noise_boost'])
+          kernel_edge = int(self.noise_dict['kernel_edge'])
+          kernel_sigma = float(self.noise_dict['kernel_sigma'])
+
+          # Sentinel-2 band-specific SNRs (R, G, B = B04, B03, B02)
+          snrs = torch.tensor([230, 249, 214], dtype=torch.float32)
+
+          # Add Poisson noise
+          poisson = torch.poisson(data[key] * photon_scale) / photon_scale
+
+          # Add Gaussian noise for each band based on the avg pixel value for that band
+          avg_per_band = torch.mean(data[key], dim=(1, 2))  # Average across spatial dimensions
+          std_dev = avg_per_band / snrs
+          
+          # Expand std_dev to match image dimensions for broadcasting
+          std_dev_expanded = std_dev.view(-1, 1, 1) * noise_boost
+          gaussian = torch.normal(0, std_dev_expanded.expand_as(data[key]))
+
+          # Apply correlation if correlate is True
           correlated_gaussian = torch.zeros_like(gaussian)
           kernel = self.custom_gkernel(kernel_edge, kernel_sigma)
           for c in range(gaussian.shape[0]):
               correlated_gaussian[c] = F.conv2d(gaussian[c].unsqueeze(0), kernel.unsqueeze(0).unsqueeze(0), padding="same").squeeze(0)
           gaussian = correlated_gaussian
 
-        # Combine noises
-        noisy = poisson + gaussian
-        
-        noisy = torch.clamp(noisy, 0, 1)  # Ensure values are in [0, 1]
-        data[key] = noisy
-      elif self.noise_dict['correlate'] == 'False': 
-        mean = float(self.noise_dict['mean'])
-        sigma = float(self.noise_dict['sigma']) / 255
-        transform = v2.GaussianNoise(mean=mean, sigma=sigma)
-        data[key] = transform(data[key])
-      else:
-        raise ValueError(f"Weird value for key 'correlate'.\nGot: {self.noise_dict['correlate']}")
+          # Combine noises
+          noisy = poisson + gaussian
+          
+          noisy = torch.clamp(noisy, 0, 1)  # Ensure values are in [0, 1]
+          data[key] = noisy
+          
+        else:
+          # Simple Gaussian noise for uncorrelated case
+          mean = float(self.noise_dict['mean'])
+          sigma = float(self.noise_dict['sigma']) / 255
+          transform = v2.GaussianNoise(mean=mean, sigma=sigma)
+          data[key] = transform(data[key])
 
     return data
   
