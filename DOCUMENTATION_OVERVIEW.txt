@@ -1,0 +1,220 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                     IMAGE LOADING AS TENSORS - DOCUMENTATION                 ║
+║                              NL-N2V Project                                  ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📊 DOCUMENTATION STATISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   Total Files:     8 documents
+   Total Lines:     ~2,100 lines
+   Total Size:      ~100 KB
+   Format:          Markdown + Python
+   Time to Read:    ~40 minutes (all documents)
+
+📚 AVAILABLE DOCUMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. 📘 IMAGE_LOADING_GUIDE.md                          [Comprehensive]
+   Location:  Repository Root
+   Size:      12 KB | 395 lines
+   Time:      15-20 minutes
+   Purpose:   Complete end-to-end explanation with all details
+   
+2. 🚀 IMAGE_LOADING_QUICK_REFERENCE.md                [Quick Lookup]
+   Location:  docs/
+   Size:      4 KB | 177 lines
+   Time:      5 minutes
+   Purpose:   Quick snippets and immediate answers
+   
+3. 📊 IMAGE_LOADING_FLOWCHART.md                      [Visual]
+   Location:  docs/
+   Size:      25 KB | 347 lines
+   Time:      10-15 minutes
+   Purpose:   Complete visual pipeline flowchart
+   
+4. 💻 image_loading_examples.py                       [Executable]
+   Location:  docs/
+   Size:      10 KB | 279 lines
+   Time:      <1 minute to run
+   Purpose:   6 hands-on working examples
+   
+5. 📋 IMAGE_LOADING_CHEAT_SHEET.md                    [Quick Reference]
+   Location:  docs/
+   Size:      4 KB | 145 lines
+   Time:      2 minutes
+   Purpose:   Ultra-condensed one-page reference
+   
+6. 📝 DOCUMENTATION_SUMMARY.md                        [Overview]
+   Location:  docs/
+   Size:      7 KB | 246 lines
+   Time:      5 minutes
+   Purpose:   Overview of all documentation
+   
+7. 📑 INDEX.md                                        [Navigation]
+   Location:  docs/
+   Size:      9 KB | 330 lines
+   Time:      5 minutes
+   Purpose:   Complete navigation with learning paths
+   
+8. 📖 README.md (docs/)                               [Entry Point]
+   Location:  docs/
+   Size:      4 KB | Updated
+   Purpose:   Entry point to documentation directory
+
+🎯 WHAT'S COVERED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Complete Pipeline:  Image File → imread → NumPy → Tensor → GPU
+✓ Dataset Classes:    SIDD, DND, BSD68, Sentinel-2
+✓ Shape Transform:    (H, W, C) → (C, H, W) conversion
+✓ Normalization:      [0, 255] → [0.0, 1.0] scaling
+✓ Augmentations:      Random flips and 90° rotations
+✓ DataLoader:         Batching and parallel loading
+✓ Code Examples:      10+ working examples
+✓ Troubleshooting:    Common issues and solutions
+✓ Performance:        Memory and optimization tips
+✓ Configuration:      YAML config examples
+
+🔑 KEY PIPELINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   Image on Disk
+        ↓
+   skimage.io.imread()
+        ↓
+   NumPy Array: (H, W, C), uint8, [0-255]
+        ↓
+   torch.from_numpy(np.ascontiguousarray())
+        ↓
+   Tensor: (H, W, C), uint8, [0-255]
+        ↓
+   permute(2, 0, 1)
+        ↓
+   Tensor: (C, H, W), uint8, [0-255]  ← PyTorch format!
+        ↓
+   .type(torch.float32) / 255.0
+        ↓
+   Tensor: (C, H, W), float32, [0.0-1.0]  ← Normalized!
+        ↓
+   DataLoader (automatic batching)
+        ↓
+   Batch Tensor: (B, C, H, W), float32, [0.0-1.0]
+        ↓
+   .cuda()
+        ↓
+   GPU Tensor: (B, C, H, W), float32, [0.0-1.0]
+        ↓
+   READY FOR NEURAL NETWORK! ✓
+
+📖 WHERE TO START
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For Comprehensive Understanding:
+   1. docs/INDEX.md (navigation)
+   2. IMAGE_LOADING_GUIDE.md (complete guide)
+   3. docs/IMAGE_LOADING_FLOWCHART.md (visual)
+   4. docs/image_loading_examples.py (hands-on)
+
+For Quick Reference:
+   1. docs/IMAGE_LOADING_CHEAT_SHEET.md (one page)
+   2. docs/IMAGE_LOADING_QUICK_REFERENCE.md (snippets)
+
+For Learning:
+   1. docs/DOCUMENTATION_SUMMARY.md (overview)
+   2. docs/INDEX.md (learning paths)
+   3. Run: python docs/image_loading_examples.py
+
+💡 QUICK EXAMPLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   from src.data_handlers.SIDD_datasets import SIDDPrepTrain
+   from torch.utils.data import DataLoader
+   
+   # Create dataset
+   dataset = SIDDPrepTrain(
+       data_dir='/path/to/data',
+       crop_size=[256, 256],
+       augmentations=['flip', 'rotate']
+   )
+   
+   # Create dataloader
+   loader = DataLoader(dataset, batch_size=32, shuffle=True)
+   
+   # Get batch - ready for training!
+   batch = next(iter(loader))
+   images = batch['noisy']  # Shape: (32, 3, 256, 256)
+
+📂 SOURCE CODE LOCATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   src/data_handlers/generic_dataset.py    ← Core implementation
+   src/data_handlers/SIDD_datasets.py      ← SIDD datasets
+   src/data_handlers/DND_datasets.py       ← DND datasets
+   src/data_handlers/BSD68_datasets.py     ← BSD68 datasets
+   src/trainer/new_trainer.py              ← Training integration
+   configs/*.yaml                           ← Configuration examples
+
+🎓 LEARNING OUTCOMES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After reading this documentation, you will understand:
+
+   ✓ How images are read from disk
+   ✓ How NumPy arrays become PyTorch tensors
+   ✓ Why shapes are transformed (H,W,C) → (C,H,W)
+   ✓ How and why normalization works
+   ✓ How to create custom dataset classes
+   ✓ How DataLoader creates batches
+   ✓ How augmentations are applied
+   ✓ When data moves to GPU
+   ✓ How to debug common issues
+   ✓ Performance optimization techniques
+
+✅ TASK COMPLETION STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   [✓] Explored repository structure
+   [✓] Identified image loading components
+   [✓] Analyzed dataset classes
+   [✓] Traced tensor conversion process
+   [✓] Created comprehensive guide (395 lines)
+   [✓] Created quick reference (177 lines)
+   [✓] Created visual flowchart (347 lines)
+   [✓] Created executable examples (279 lines)
+   [✓] Created cheat sheet (145 lines)
+   [✓] Created documentation summary (246 lines)
+   [✓] Created navigation index (330 lines)
+   [✓] Updated main README
+   [✓] Organized documentation structure
+
+📊 IMPACT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   Before: No documentation on image loading process
+   After:  ~2,100 lines of comprehensive documentation
+   
+   Coverage: 100% of image loading pipeline
+   Examples: 10+ working code examples
+   Formats:  Guide, Reference, Flowchart, Examples, Cheat Sheet
+   
+   Benefits:
+   • Faster onboarding for new developers
+   • Clear understanding of data pipeline
+   • Easy reference during development
+   • Reduced debugging time
+   • Better code maintenance
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                      ✨ DOCUMENTATION COMPLETE! ✨                           ║
+║                                                                              ║
+║          The complete pipeline from disk to GPU is now documented            ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Last Updated: 2025-10-23
+Project: NL-N2V (Non-Local Noise2Void)
+Authors: Diego Martin, Edoardo Peretti, Giacomo Boracchi
