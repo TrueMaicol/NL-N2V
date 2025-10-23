@@ -2,6 +2,10 @@
 
 This directory contains comprehensive documentation about how images are loaded and converted to PyTorch tensors in the NL-N2V project.
 
+## 📑 Quick Navigation
+
+**→ Start here: [INDEX.md](INDEX.md)** - Complete guide to all documentation with learning paths
+
 ## Available Documentation
 
 ### 📘 Comprehensive Guide
