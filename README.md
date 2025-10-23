@@ -13,6 +13,20 @@ Here is the link for the [paper](Paper link will be provided when available).
 
 ---
 
+## 📖 Documentation
+
+### Understanding Image Loading
+
+For a detailed explanation of how images are loaded and converted to PyTorch tensors in this project, see:
+- **[IMAGE_LOADING_GUIDE.md](IMAGE_LOADING_GUIDE.md)** - Comprehensive guide with detailed explanations
+- **[docs/IMAGE_LOADING_QUICK_REFERENCE.md](docs/IMAGE_LOADING_QUICK_REFERENCE.md)** - Quick reference for common tasks
+- **[docs/IMAGE_LOADING_FLOWCHART.md](docs/IMAGE_LOADING_FLOWCHART.md)** - Visual flowchart of the entire pipeline
+- **[docs/image_loading_examples.py](docs/image_loading_examples.py)** - Executable examples demonstrating the process
+
+These documents explain the complete pipeline from reading images from disk to creating GPU-ready tensor batches.
+
+---
+
 ## 📁 Repository Structure
 
 The project is organized as follows:
